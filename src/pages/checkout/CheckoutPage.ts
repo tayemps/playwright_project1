@@ -7,7 +7,7 @@ export class CheckoutPage extends BasePage {
     readonly phoneInput: Locator;
     readonly submitButton: Locator;
 
-    constructor(page: Page, private readonly url: string = 'http://ostest.rpinsys.com/checkout') {
+    constructor(page: Page, private readonly url: string = '/checkout') {
         super(page);
         this.emailInput = page.getByRole('textbox', { name: /email/i });
         this.addressInput = page.getByRole('textbox', { name: /address/i });

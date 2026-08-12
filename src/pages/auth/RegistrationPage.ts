@@ -8,7 +8,7 @@ export class RegistrationPage extends BasePage {
     readonly confirmPasswordInput: Locator;
     readonly submitButton: Locator;
 
-    constructor(page: Page, private readonly url: string = 'http://ostest.rpinsys.com/register') {
+    constructor(page: Page, private readonly url: string = '/register') {
         super(page);
         this.fullNameInput = page.getByRole('textbox', { name: /full name|name/i });
         this.emailInput = page.getByRole('textbox', { name: /email/i });

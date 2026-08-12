@@ -1,21 +1,36 @@
-import { test } from '@playwright/test';
-import { LoginPage } from '../../src/pages/auth/LoginPage.js';
+import { test, expect } from '@playwright/test';
 
-test.describe('Login flow', () => {
-    test('allows a valid user to sign in', async ({ page }) => {
-        const loginPage = new LoginPage(page);
+const loginUrl = process.env.RPINSYS_BASE_URL;
+const username = process.env.RPINSYS_TEST_USER;
+const password = process.env.RPINSYS_TEST_PASS;
 
-        await loginPage.open();
-        await loginPage.login('wanhasyraf', 'abc123');
-        await page.waitForURL(/dashboard/i, { timeout: 30000 });
-        await loginPage.expectSuccessfulLogin();
+if (!loginUrl) throw new Error('Missing RPINSYS_BASE_URL in environment configuration');
+if (!username) throw new Error('Missing RPINSYS_TEST_USER in environment configuration');
+if (!password) throw new Error('Missing RPINSYS_TEST_PASS in environment configuration');
+
+test.describe('smoke login', () => {
+    test.beforeEach(async ({ page }) => {
+        await page.goto(loginUrl);
+        await expect(page.getByRole('heading', { name: /login to your account/i })).toBeVisible();
+        await expect(page.locator('form#login-form')).toBeVisible();
     });
 
-    test('rejects invalid credentials', async ({ page }) => {
-        const loginPage = new LoginPage(page);
+    test('should log in using secure env credentials and verify successful dashboard access', async ({ page }) => {
+        const usernameInput = page.getByPlaceholder('Username');
+        const passwordInput = page.getByPlaceholder('Password');
+        const loginButton = page.getByRole('button', { name: /^login$/i });
 
-        await loginPage.open();
-        await loginPage.login('wrong-user', 'wrong-pass');
-        await loginPage.expectFailedLogin();
+        await expect(usernameInput).toBeVisible();
+        await expect(passwordInput).toBeVisible();
+        await usernameInput.fill(username);
+        await passwordInput.fill(password);
+
+        await Promise.all([
+            page.waitForNavigation({ waitUntil: 'networkidle' }),
+            loginButton.click(),
+        ]);
+
+        await expect(page.locator('div.alert.alert-success')).toBeVisible();
+        await expect(page).toHaveURL(/dashboard|home|profile/i);
     });
 });

@@ -30,7 +30,9 @@ npm run report
 ## Environment variables
 
 ```bash
-BASE_URL=https://example.com
+RPINSYS_BASE_URL="http://ostest.rpinsys.com/login"
+RPINSYS_TEST_USER="<username>"
+RPINSYS_TEST_PASS="<password>"
 PW_WORKERS=4
 ```
 

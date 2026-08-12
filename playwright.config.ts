@@ -1,10 +1,21 @@
+// playwright.config.ts
 import { defineConfig, devices } from '@playwright/test';
+import * as dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
 
+// Load environment variables from your secure local .env file
+const __dirname = dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: resolve(__dirname, '.env') });
+
+const rawBaseUrl = process.env.RPINSYS_BASE_URL ?? 'http://ostest.rpinsys.com/login';
+const baseUrl = rawBaseUrl.replace(/\/login\/?$/, '');
 const isCI = Boolean(process.env.CI);
 const workers = process.env.PW_WORKERS ? Number(process.env.PW_WORKERS) : undefined;
 
 export default defineConfig({
     testDir: './tests',
+    globalSetup: './global-setup.ts',
     fullyParallel: true,
     forbidOnly: isCI,
     retries: isCI ? 1 : 0,
@@ -14,7 +25,7 @@ export default defineConfig({
         ['html', { open: 'never', outputFolder: 'playwright-report' }],
     ],
     use: {
-        baseURL: process.env.BASE_URL ?? 'https://example.com',
+        baseURL: baseUrl,
         headless: true,
         ignoreHTTPSErrors: true,
         trace: 'retain-on-failure',
