@@ -11,15 +11,14 @@ dotenv.config({ path: resolve(__dirname, '.env') });
 const rawBaseUrl = process.env.RPINSYS_BASE_URL ?? 'http://ostest.rpinsys.com/login';
 const baseUrl = rawBaseUrl.replace(/\/login\/?$/, '');
 const isCI = Boolean(process.env.CI);
-const workers = process.env.PW_WORKERS ? Number(process.env.PW_WORKERS) : undefined;
 
 export default defineConfig({
     testDir: './tests',
     globalSetup: './global-setup.ts',
-    fullyParallel: true,
+    fullyParallel: false,
     forbidOnly: isCI,
     retries: isCI ? 1 : 0,
-    workers,
+    workers: 1,
     reporter: [
         ['list'],
         ['html', { open: 'never', outputFolder: 'playwright-report' }],
